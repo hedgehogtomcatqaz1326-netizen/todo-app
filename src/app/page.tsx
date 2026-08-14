@@ -19,7 +19,7 @@ interface ChatMessage {
 export default function Home() {
   const sessionResult = useSession();
   const session = sessionResult?.data;
-  const status = sessionResult?.status ?? "loading";
+  const status = sessionResult?.status ?? "unauthenticated";
 
   const [todos, setTodos] = useState<Todo[]>([]);
   const [newTodo, setNewTodo] = useState("");
@@ -211,14 +211,6 @@ export default function Home() {
     setMessages((prev) => [...prev, userMsg, botMsg]);
     if (!customText) setChatInput("");
   };
-
-  if (status === "loading") {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-50">
-        <p className="text-gray-500 font-medium">読み込み中...</p>
-      </div>
-    );
-  }
 
   if (!session) {
     return (
