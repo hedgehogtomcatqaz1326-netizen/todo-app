@@ -7,13 +7,13 @@ interface Todo {
   id: string;
   title: string;
   completed: boolean;
-  starred?: boolean; // 【機能2】スター（重要度）
+  starred?: boolean;
 }
 
 interface ChatMessage {
   sender: "user" | "bot";
   text: string;
-  links?: { title: string; url: string }[]; // 参考リンク用
+  links?: { title: string; url: string }[];
 }
 
 export default function Home() {
@@ -26,7 +26,6 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // 【機能3】タスク攻略チャット状態
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatInput, setChatInput] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -36,7 +35,6 @@ export default function Home() {
     },
   ]);
 
-  // 【機能1】絵文字付きワンタップクイック入力
   const quickEmojiTasks = [
     { label: "🛒 買い物", text: "🛒 買い出しに行く" },
     { label: "📞 連絡", text: "📞 メール/電話を返す" },
@@ -45,7 +43,6 @@ export default function Home() {
     { label: "☕ 休憩", text: "☕ リフレッシュ休憩" },
   ];
 
-  // ログイン中ならGASからTodoを取得
   useEffect(() => {
     if (session?.user) {
       fetchTodos();
@@ -70,7 +67,6 @@ export default function Home() {
     }
   };
 
-  // タスク追加
   const addTodo = async (e?: React.FormEvent, customTitle?: string) => {
     if (e) e.preventDefault();
     const titleToAdd = customTitle || newTodo;
@@ -112,7 +108,6 @@ export default function Home() {
     }
   };
 
-  // 完了切替
   const toggleTodo = async (id: string, currentCompleted: boolean) => {
     setTodos((prev) =>
       prev.map((t) => (t.id === id ? { ...t, completed: !currentCompleted } : t))
@@ -140,14 +135,12 @@ export default function Home() {
     }
   };
 
-  // 【機能2】スター（重要度）切替
   const toggleStar = (id: string) => {
     setTodos((prev) =>
       prev.map((t) => (t.id === id ? { ...t, starred: !t.starred } : t))
     );
   };
 
-  // タスク削除
   const deleteTodo = async (id: string) => {
     setTodos((prev) => prev.filter((t) => t.id !== id));
     const gasUrl = process.env.NEXT_PUBLIC_GAS_URL;
@@ -172,7 +165,6 @@ export default function Home() {
     }
   };
 
-  // 【機能3】タスク攻略・動画リンク生成応答ロジック
   const handleTaskGuideReply = (userQuery: string): ChatMessage => {
     const activeTodos = todos.filter((t) => !t.completed);
     const targetQuery = userQuery.trim();
@@ -200,7 +192,6 @@ export default function Home() {
     };
   };
 
-  // チャット送信処理
   const handleSendChat = (customText?: string) => {
     const text = customText || chatInput;
     if (!text.trim()) return;
@@ -229,7 +220,6 @@ export default function Home() {
     );
   }
 
-  // 未ログイン時
   if (!session) {
     return (
       <main className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
@@ -249,26 +239,22 @@ export default function Home() {
     );
   }
 
-  // ログイン済み画面
   return (
     <main className="min-h-screen bg-gray-50 py-10 px-4 relative pb-24">
       <div className="max-w-md mx-auto bg-white rounded-xl shadow-md p-6 border">
-        
-        {/* ヘッダー */}
         <div className="flex justify-between items-center mb-4 pb-3 border-b">
           <div>
-            <h1 className="text-xl font-bold text-gray-800">スマート ToDo</h1>
-            <p className="text-xs text-gray-500">ログイン中</p>
+            <h1 className="text-xl font-bold text-gray-800">マイ ToDo</h1>
+            <p className="text-xs text-gray-500">{session.user?.email}</p>
           </div>
           <button
             onClick={() => signOut({ callbackUrl: "/" })}
-            className="text-xs text-red-500 hover:underline border border-red-200 px-2 py-1 rounded"
+            className="text-xs text-red-500 font-semibold hover:underline"
           >
             ログアウト
           </button>
         </div>
 
-        {/* エラーメッセージ表示 */}
         {errorMessage && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-xs rounded-lg flex justify-between items-center">
             <span>{errorMessage}</span>
@@ -276,7 +262,6 @@ export default function Home() {
           </div>
         )}
 
-        {/* 入力フォーム */}
         <form onSubmit={addTodo} className="flex gap-2 mb-3">
           <input
             type="text"
@@ -285,7 +270,7 @@ export default function Home() {
               setNewTodo(e.target.value);
               if (errorMessage) setErrorMessage("");
             }}
-            placeholder="タスクを入力（または下の絵文字を選択）"
+            placeholder="新しいタスクを入力..."
             className="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
@@ -296,7 +281,6 @@ export default function Home() {
           </button>
         </form>
 
-        {/* 【機能1】絵文字ワンタップクイック入力 */}
         <div className="mb-5">
           <p className="text-xs text-gray-400 mb-1.5">ワンタップでクイック追加:</p>
           <div className="flex flex-wrap gap-1.5">
@@ -313,7 +297,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* タスク一覧 */}
         {loading ? (
           <p className="text-center text-sm text-gray-400 py-6">タスクを読み込み中...</p>
         ) : todos.length === 0 ? (
@@ -332,8 +315,6 @@ export default function Home() {
                     onChange={() => toggleTodo(todo.id, todo.completed)}
                     className="w-4 h-4 text-blue-600 rounded cursor-pointer"
                   />
-                  
-                  {/* 【機能2】⭐ スター切り替えボタン */}
                   <button
                     onClick={() => toggleStar(todo.id)}
                     className="text-base leading-none focus:outline-none"
@@ -363,7 +344,6 @@ export default function Home() {
         )}
       </div>
 
-      {/* ---------------- 【機能3】タスク攻略ヘルプチャットUI ---------------- */}
       <div className="fixed bottom-5 right-5 z-50">
         {!isChatOpen ? (
           <button
@@ -375,7 +355,6 @@ export default function Home() {
           </button>
         ) : (
           <div className="bg-white border rounded-xl shadow-2xl w-80 sm:w-96 flex flex-col h-96 overflow-hidden transition">
-            {/* ヘッダー */}
             <div className="bg-blue-600 text-white p-3 flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <span className="text-lg">🤖</span>
@@ -389,7 +368,6 @@ export default function Home() {
               </button>
             </div>
 
-            {/* チャットログ */}
             <div className="flex-1 p-3 overflow-y-auto space-y-2.5 text-xs bg-gray-50">
               {messages.map((msg, index) => (
                 <div
@@ -404,7 +382,6 @@ export default function Home() {
                     }`}
                   >
                     <div>{msg.text}</div>
-                    {/* 動画・検索リンク表示 */}
                     {msg.links && (
                       <div className="mt-2 pt-2 border-t border-gray-100 flex flex-col gap-1.5">
                         {msg.links.map((link, lIdx) => (
@@ -425,7 +402,6 @@ export default function Home() {
               ))}
             </div>
 
-            {/* クイックアクション */}
             <div className="p-2 border-t bg-white flex gap-1 overflow-x-auto text-[11px]">
               <button
                 onClick={() => handleSendChat("タスクの攻略法や動画を探して")}
@@ -441,7 +417,6 @@ export default function Home() {
               </button>
             </div>
 
-            {/* 入力フォーム */}
             <form
               onSubmit={(e) => {
                 e.preventDefault();
