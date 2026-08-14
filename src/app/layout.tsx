@@ -1,23 +1,19 @@
-import NextAuth from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
+import type { Metadata } from "next";
+import "./globals.css";
 
-const handler = NextAuth({
-  providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID || "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-    }),
-  ],
-  secret: process.env.NEXTAUTH_SECRET || "fallback-secret-key-123456789",
-  useSecureCookies: true,
-  callbacks: {
-    async session({ session }) {
-      return session;
-    },
-    async redirect({ baseUrl }) {
-      return baseUrl;
-    },
-  },
-});
+export const metadata: Metadata = {
+  title: "やることリストアプリ",
+  description: "Todo App",
+};
 
-export { handler as GET, handler as POST };
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="ja">
+      <body>{children}</body>
+    </html>
+  );
+}
