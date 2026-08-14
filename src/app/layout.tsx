@@ -8,7 +8,12 @@ const handler = NextAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
     }),
   ],
-  secret: process.env.NEXTAUTH_SECRET || "fallback_secret_key_123456789",
+  secret: process.env.NEXTAUTH_SECRET || "secret123456789",
+  pages: {
+    signIn: "/",
+    error: "/api/auth/error-debug", // エラー時にリダイレクトさせず画面表示する
+  },
+  debug: true,
 });
 
 export { handler as GET, handler as POST };
