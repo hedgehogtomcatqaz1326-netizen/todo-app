@@ -1,19 +1,33 @@
-import NextAuth from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
-const handler = NextAuth({
+export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
     }),
   ],
-  secret: process.env.NEXTAUTH_SECRET || "secret123456789",
-  pages: {
-    signIn: "/",
-    error: "/api/auth/error-debug", // エラー時にリダイレクトさせず画面表示する
+  secret: process.env.NEXTAUTH_SECRET || "fallback-secret-key-123456789",
+  cookies: {
+    sessionToken: {
+      name: `__Secure-next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: true,
+      },
+    },
   },
-  debug: true,
-});
+  callbacks: {
+    async redirect({ url, baseUrl }) {
+      // Vercel上のドメインに強制固定してループを防ぐ
+      return "https://todo-app-murex-seven-96.vercel.app";
+    },
+  },
+};
+
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
