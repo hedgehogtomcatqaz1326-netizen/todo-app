@@ -17,7 +17,10 @@ interface ChatMessage {
 }
 
 export default function Home() {
-  const { data: session, status } = useSession();
+  const sessionResult = useSession();
+  const session = sessionResult?.data;
+  const status = sessionResult?.status ?? "loading";
+
   const [todos, setTodos] = useState<Todo[]>([]);
   const [newTodo, setNewTodo] = useState("");
   const [loading, setLoading] = useState(false);
@@ -174,7 +177,6 @@ export default function Home() {
     const activeTodos = todos.filter((t) => !t.completed);
     const targetQuery = userQuery.trim();
 
-    // 未完了タスクがあればそのタイトル、無ければ送信された入力内容を使用
     const keyword = activeTodos.length > 0 ? activeTodos[0].title : targetQuery;
     const cleanKeyword = keyword.replace(/[🛒📞💻🏃☕]/g, "").trim();
 
