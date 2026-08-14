@@ -9,21 +9,13 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET || "fallback-secret-key-123456789",
-  cookies: {
-    sessionToken: {
-      name: `__Secure-next-auth.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: true,
-      },
-    },
-  },
+  useSecureCookies: true,
   callbacks: {
-    async redirect({ url, baseUrl }) {
-      // Vercel上のドメインに強制固定してループを防ぐ
-      return "https://todo-app-murex-seven-96.vercel.app";
+    async session({ session }) {
+      return session;
+    },
+    async redirect({ baseUrl }) {
+      return baseUrl;
     },
   },
 };
